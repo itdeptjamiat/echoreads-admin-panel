@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { createMagazine } from '../lib/api';
 
 const TestMagazinePage: React.FC = () => {
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<{ error?: string } | Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(false);
 
   const testCreateMagazine = async () => {

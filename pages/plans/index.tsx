@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '../../components/layouts/AdminLayout';
 import PlanForm from '../../components/plans/PlanForm';
 import DeletePlanModal from '../../components/plans/DeletePlanModal';
@@ -16,45 +16,7 @@ const PlansPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const { addNotification } = useNotifications();
 
-  // Fetch plans from API
-  useEffect(() => {
-    loadPlans();
-  }, []);
-
-
-
-  const handleAddPlanSuccess = () => {
-    setShowAddPlanForm(false);
-    // Refresh the plans list
-    loadPlans();
-  };
-
-  const handleDeletePlan = (plan: Plan) => {
-    setSelectedPlan(plan);
-    setShowDeleteModal(true);
-  };
-
-  const handleDeleteSuccess = () => {
-    setShowDeleteModal(false);
-    setSelectedPlan(null);
-    // Refresh the plans list
-    loadPlans();
-  };
-
-
-
-  const handleEditPlan = (plan: Plan) => {
-    setSelectedPlan(plan);
-    setShowEditPlanForm(true);
-  };
-
-  const handleEditSuccess = () => {
-    loadPlans();
-    setShowEditPlanForm(false);
-    setSelectedPlan(null);
-  };
-
-  const loadPlans = async () => {
+  const loadPlans = useCallback(async () => {
     try {
       setLoading(true);
       const result = await fetchPlans();
@@ -77,6 +39,40 @@ const PlansPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  }, [addNotification]);
+
+  // Fetch plans from API
+  useEffect(() => {
+    loadPlans();
+  }, [loadPlans]);
+
+  const handleAddPlanSuccess = () => {
+    setShowAddPlanForm(false);
+    // Refresh the plans list
+    loadPlans();
+  };
+
+  const handleDeletePlan = (plan: Plan) => {
+    setSelectedPlan(plan);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteSuccess = () => {
+    setShowDeleteModal(false);
+    setSelectedPlan(null);
+    // Refresh the plans list
+    loadPlans();
+  };
+
+  const handleEditPlan = (plan: Plan) => {
+    setSelectedPlan(plan);
+    setShowEditPlanForm(true);
+  };
+
+  const handleEditSuccess = () => {
+    loadPlans();
+    setShowEditPlanForm(false);
+    setSelectedPlan(null);
   };
 
   return (

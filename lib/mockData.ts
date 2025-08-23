@@ -9,6 +9,14 @@ export interface Magazine {
   issueDate: string;
   description?: string;
   status?: 'active' | 'inactive' | 'draft';
+  total_pages?: number;
+  fileType?: string;
+  isActive?: boolean;
+  rating?: number;
+  downloads?: number;
+  views?: number;
+  likes?: number;
+  reads?: number;
 }
 
 export const magazines: Magazine[] = [

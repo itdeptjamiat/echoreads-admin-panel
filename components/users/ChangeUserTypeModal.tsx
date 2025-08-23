@@ -69,7 +69,7 @@ const ChangeUserTypeModal: React.FC<ChangeUserTypeModalProps> = ({
           type: 'error'
         });
       }
-    } catch (error) {
+    } catch {
       setError('An unexpected error occurred');
       addNotification({
         title: 'Change Failed',

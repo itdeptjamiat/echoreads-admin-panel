@@ -38,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
           // Forward the response from external API
           return res.status(externalResponse.status).json(data);
-        } catch (error) {
+        } catch {
           return res.status(500).json({
             success: false,
             message: 'Failed to fetch categories from external API'
@@ -78,7 +78,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
           // Forward the response from external API
           return res.status(externalResponse.status).json(data);
-        } catch (error) {
+        } catch {
           return res.status(500).json({
             success: false,
             message: 'Failed to add category to external API'
@@ -114,7 +114,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             message: 'Category deletion not yet implemented in external API',
             data: data.data || []
           });
-        } catch (error) {
+        } catch {
           return res.status(500).json({
             success: false,
             message: 'Failed to process category deletion'
@@ -132,7 +132,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           });
         }
 
-        const trimmedOldName = oldName.trim();
+
         const trimmedNewName = newName.trim();
         
         if (!trimmedNewName) {
@@ -160,7 +160,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             message: 'Category update not yet implemented in external API',
             data: data.data || []
           });
-        } catch (error) {
+        } catch {
           return res.status(500).json({
             success: false,
             message: 'Failed to process category update'
@@ -174,7 +174,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           message: `Method ${req.method} Not Allowed`
         });
     }
-  } catch (error) {
+  } catch {
     res.status(500).json({
       success: false,
       message: 'Internal server error'

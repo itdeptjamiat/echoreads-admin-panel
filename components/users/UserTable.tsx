@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { deleteUser, extractAdminIdFromToken } from '../../lib/api';
 import { useNotifications } from '../../lib/notificationContext';
-import { useAuth } from '../../lib/authContext';
+
 import ChangeUserTypeModal from './ChangeUserTypeModal';
 
 interface User {
@@ -46,7 +46,7 @@ const UserTable: React.FC<UserTableProps> = ({
 }) => {
   const router = useRouter();
   const { addNotification } = useNotifications();
-  const { user: currentUser } = useAuth();
+
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);

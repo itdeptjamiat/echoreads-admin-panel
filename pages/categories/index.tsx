@@ -206,7 +206,7 @@ const CategoriesPage: React.FC = () => {
           ) : (
             <div className="divide-y divide-gray-200">
               {categories.map((cat, idx) => (
-                <div key={cat} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors duration-200">
+                <div key={cat._id || idx} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors duration-200">
                   {editingIndex === idx ? (
                     <div className="flex items-center space-x-3 flex-1">
                       <input

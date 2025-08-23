@@ -261,18 +261,28 @@ const MagazineForm: React.FC<MagazineFormProps> = ({ onSubmit, onCancel, initial
         image: imageUrl,
         file: fileUrl,
         audioFile: audioUrl || undefined,
-        total_pages: formData.total_pages ? parseInt(formData.total_pages) : undefined,
+        total_pages: formData.total_pages ? parseInt(String(formData.total_pages)) : undefined,
         fileType: formData.fileType,
         isActive: formData.isActive,
-        rating: parseInt(formData.rating),
-        downloads: parseInt(formData.downloads),
-        views: parseInt(formData.views),
-        likes: parseInt(formData.likes),
-        reads: parseInt(formData.reads)
+        rating: parseInt(String(formData.rating)),
+        downloads: parseInt(String(formData.downloads)),
+        views: parseInt(String(formData.views)),
+        likes: parseInt(String(formData.likes)),
+        reads: parseInt(String(formData.reads))
       };
 
       if (onSubmit) {
-        onSubmit(magazineData);
+        onSubmit({
+          name: magazineData.name,
+          description: magazineData.description,
+          category: magazineData.category,
+          type: magazineData.type,
+          magzineType: magazineData.magzineType,
+          image: magazineData.image,
+          file: magazineData.file,
+          coverImage: selectedImage,
+          pdfFile: selectedFile
+        });
       } else {
         // Default behavior - redirect to magazines page
         router.push('/magazines');
