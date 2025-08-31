@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { Magazine } from '../../lib/mockData';
 import { validateFile } from '../../lib/cloudflareStorage';
 import { simpleUpload } from '../../lib/simpleUpload';
-import { fetchCategories, Category } from '../../lib/api';
+import { fetchCategories, Category, createMagazine } from '../../lib/api';
 import { useNotifications } from '../../lib/notificationContext';
 
 const magazineTypes = [
@@ -271,37 +271,155 @@ const MagazineForm: React.FC<MagazineFormProps> = ({ onSubmit, onCancel, initial
         reads: parseInt(String(formData.reads))
       };
 
-      if (onSubmit) {
-        onSubmit({
-          name: magazineData.name,
-          description: magazineData.description,
-          category: magazineData.category,
-          type: magazineData.type,
-          magzineType: magazineData.magzineType,
-          image: magazineData.image,
-          file: magazineData.file,
-          coverImage: selectedImage,
-          pdfFile: selectedFile
-        });
-      } else {
-        // Default behavior - redirect to magazines page
-        router.push('/magazines');
-      }
+      // Actually create the magazine through the API
+      const result = await createMagazine(magazineData);
 
-      // Add notification for successful magazine creation
-      addNotification({
-        title: 'Magazine Created Successfully',
-        message: `"${formData.name}" has been added to the platform`,
-        type: 'success',
-        action: {
-          label: 'View Magazines',
-          href: '/magazines'
+      // Debug: Log the full response to see its structure
+      console.log('Full API Response:', result);
+      console.log('Response data:', result.data);
+      console.log('Response success:', result.success);
+
+      if (result.success && result.data) {
+        // Extract the magazine ID from the response
+        // The API response structure may vary, so we'll try different possible fields
+        let mid = (result.data as any).mid || (result.data as any).id || (result.data as any)._id || (result.data as any).magazineId;
+        
+        // If still no ID, try to find it in nested structures
+        if (!mid && (result.data as any).magazine) {
+          mid = (result.data as any).magazine.mid || (result.data as any).magazine.id || (result.data as any).magazine._id;
         }
-      });
+        
+        // If still no ID, try to find any numeric ID field
+        if (!mid) {
+          const allKeys = Object.keys(result.data);
+          for (const key of allKeys) {
+            const value = (result.data as any)[key];
+            if (typeof value === 'number' && value > 0) {
+              mid = value;
+              console.log(`Found potential ID in field '${key}':`, value);
+              break;
+            }
+          }
+        }
+        
+        console.log('Extracted magazine ID:', mid);
+        console.log('Available fields in result.data:', Object.keys(result.data));
+        
+        if (mid) {
+          // Dispatch event for multi-step wrapper to capture
+          const event = new CustomEvent('magazine-created', {
+            detail: {
+              magazineId: mid,
+              magazineData: {
+                name: formData.name,
+                description: formData.description,
+                category: formData.category,
+                type,
+                magzineType,
+                ...(result.data as any)
+              }
+            }
+          });
+          window.dispatchEvent(event);
 
-      setLoading(false);
-      setUploadProgress(0);
-    } catch {
+          // Call onSubmit with the form data (for backward compatibility)
+          if (onSubmit) {
+            onSubmit({
+              name: magazineData.name,
+              description: magazineData.description,
+              category: magazineData.category,
+              type: magazineData.type,
+              magzineType: magazineData.magzineType,
+              image: magazineData.image,
+              file: magazineData.file,
+              coverImage: selectedImage,
+              pdfFile: selectedFile
+            });
+          }
+
+          // Add notification for successful magazine creation
+          addNotification({
+            title: 'Magazine Created Successfully',
+            message: `"${formData.name}" has been added to the platform`,
+            type: 'success',
+            action: {
+              label: 'View Magazines',
+              href: '/magazines'
+            }
+          });
+
+          setLoading(false);
+          setUploadProgress(0);
+          return;
+        } else {
+          // If we can't find the ID, show an error with manual input option
+          const manualId = prompt(
+            'Magazine created successfully but could not get magazine ID automatically.\n\n' +
+            'Please check the console for the API response and enter the magazine ID manually:'
+          );
+          
+          if (manualId && manualId.trim()) {
+            // Use the manually entered ID
+            const event = new CustomEvent('magazine-created', {
+              detail: {
+                magazineId: manualId.trim(),
+                magazineData: {
+                  name: formData.name,
+                  description: formData.description,
+                  category: formData.category,
+                  type,
+                  magzineType,
+                  ...(result.data as any)
+                }
+              }
+            });
+            window.dispatchEvent(event);
+
+            // Call onSubmit with the form data (for backward compatibility)
+            if (onSubmit) {
+              onSubmit({
+                name: magazineData.name,
+                description: magazineData.description,
+                category: magazineData.category,
+                type: magazineData.type,
+                magzineType: magazineData.magzineType,
+                image: magazineData.image,
+                file: magazineData.file,
+                coverImage: selectedImage,
+                pdfFile: selectedFile
+              });
+            }
+
+            // Add notification for successful magazine creation
+            addNotification({
+              title: 'Magazine Created Successfully',
+              message: `"${formData.name}" has been added to the platform`,
+              type: 'success',
+              action: {
+                label: 'View Magazines',
+                href: '/magazines'
+              }
+            });
+
+            setLoading(false);
+            setUploadProgress(0);
+            return;
+          } else {
+            // User cancelled or didn't enter ID
+            setError('Magazine created successfully but could not get magazine ID. Please check the response.');
+            console.error('Magazine creation response:', result);
+            console.error('Available fields in result.data:', Object.keys(result.data));
+            console.error('Full result.data object:', result.data);
+            setLoading(false);
+            return;
+          }
+        }
+      } else {
+        setError(result.message || 'Failed to create magazine');
+        setLoading(false);
+        return;
+      }
+    } catch (error) {
       setError('An unexpected error occurred');
       addNotification({
         title: 'Magazine Creation Failed',

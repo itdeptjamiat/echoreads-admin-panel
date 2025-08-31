@@ -119,6 +119,11 @@ export default async function handler(
 
     const data = await externalResponse.json();
 
+    // Debug: Log the external API response
+    console.log('External API Response Status:', externalResponse.status);
+    console.log('External API Response Data:', data);
+    console.log('External API Response Keys:', Object.keys(data));
+
     // Forward the response from external API
     return res.status(externalResponse.status).json(data);
 

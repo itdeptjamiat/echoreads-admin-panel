@@ -2,69 +2,13 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import AdminLayout from '../../components/layouts/AdminLayout';
-import MagazineForm from '../../components/magazines/MagazineForm';
-import { createMagazine } from '../../lib/api';
+import MultiStepMagazineForm from '../../components/magazines/MultiStepMagazineForm';
 
 const AddMagazine: React.FC = () => {
   const router = useRouter();
 
-  const handleSubmit = async (formData: {
-    name: string;
-    description: string;
-    category: string;
-    type: 'free' | 'pro';
-    magzineType: 'magzine' | 'article' | 'digest';
-    image: string;
-    file: string;
-    audioFile?: string;
-    total_pages?: number;
-    fileType?: string;
-    isActive?: boolean;
-    rating?: number;
-    downloads?: number;
-    views?: number;
-    likes?: number;
-    reads?: number;
-    coverImage: File | null;
-    pdfFile: File | null;
-  }) => {
-    try {
-      // Form submitted with data
-      
-      // Send the data to your API
-      const result = await createMagazine({
-        name: formData.name,
-        description: formData.description,
-        category: formData.category,
-        type: formData.type,
-        magzineType: formData.magzineType,
-        image: formData.image,
-        file: formData.file,
-        audioFile: formData.audioFile,
-        total_pages: formData.total_pages,
-        fileType: formData.fileType,
-        isActive: formData.isActive,
-        rating: formData.rating,
-        downloads: formData.downloads,
-        views: formData.views,
-        likes: formData.likes,
-        reads: formData.reads,
-      });
-
-      if (result.success) {
-        alert('Magazine created successfully!');
-        router.push('/magazines');
-      } else {
-        alert(`Error creating magazine: ${result.message}`);
-      }
-          } catch {
-      // Error submitting magazine silently handled
-      alert('Error submitting magazine. Please try again.');
-    }
-  };
-
   const handleCancel = () => {
-    // Placeholder onCancel function that navigates back to /magazines
+    // Navigate back to magazines list
     router.push('/magazines');
   };
 
@@ -87,8 +31,8 @@ const AddMagazine: React.FC = () => {
           </Link>
         </div>
 
-        {/* Magazine Form */}
-        <MagazineForm onSubmit={handleSubmit} onCancel={handleCancel} />
+        {/* Multi-Step Magazine Form */}
+        <MultiStepMagazineForm onCancel={handleCancel} />
       </div>
     </AdminLayout>
   );
