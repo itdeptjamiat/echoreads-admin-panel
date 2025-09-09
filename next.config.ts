@@ -9,6 +9,14 @@ const nextConfig: NextConfig = {
   experimental: {
     // This ensures environment variables are available
   },
+  // TypeScript configuration
+  typescript: {
+    // !! WARN !!
+    // Dangerously allow production builds to successfully complete even if
+    // your project has type errors.
+    // !! WARN !!
+    ignoreBuildErrors: false,
+  },
   // Security headers
   async headers() {
     return [

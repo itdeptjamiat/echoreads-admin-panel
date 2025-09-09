@@ -121,10 +121,10 @@ export default async function handler(
       });
     }
 
-      } catch {
-      return res.status(500).json({
-        success: false,
-        message: 'Internal server error'
-      });
-    }
-} 
+  } catch {
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+}
